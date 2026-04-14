@@ -1,0 +1,30 @@
+---
+# ── xh (cargo) ────────────────────────────────────────────────────
+- name: Install xh via cargo
+  become_user: vagrant
+  command: /home/vagrant/.cargo/bin/cargo install xh
+  args:
+    creates: /home/vagrant/.cargo/bin/xh
+  when: box_config.http.xh
+
+# ── glow (go) ─────────────────────────────────────────────────────
+- name: Install glow via go install
+  become_user: vagrant
+  command: /usr/local/go/bin/go install github.com/charmbracelet/glow@latest
+  args:
+    creates: /home/vagrant/go/bin/glow
+  environment:
+    GOPATH: /home/vagrant/go
+    PATH: "/usr/local/go/bin:{{ ansible_env.PATH }}"
+  when: box_config.http.glow
+
+# ── yq (go) ───────────────────────────────────────────────────────
+- name: Install yq via go install
+  become_user: vagrant
+  command: /usr/local/go/bin/go install github.com/mikefarah/yq/v4@latest
+  args:
+    creates: /home/vagrant/go/bin/yq
+  environment:
+    GOPATH: /home/vagrant/go
+    PATH: "/usr/local/go/bin:{{ ansible_env.PATH }}"
+  when: box_config.http.yq

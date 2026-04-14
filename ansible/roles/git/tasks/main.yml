@@ -1,0 +1,31 @@
+---
+# ── lazygit ───────────────────────────────────────────────────────
+- name: Install lazygit via go install
+  become_user: vagrant
+  command: /usr/local/go/bin/go install github.com/jesseduffield/lazygit@latest
+  args:
+    creates: /home/vagrant/go/bin/lazygit
+  environment:
+    GOPATH: /home/vagrant/go
+    PATH: "/usr/local/go/bin:{{ ansible_env.PATH }}"
+  when: box_config.git.lazygit
+
+# ── delta ─────────────────────────────────────────────────────────
+- name: Install delta via cargo
+  become_user: vagrant
+  command: /home/vagrant/.cargo/bin/cargo install git-delta
+  args:
+    creates: /home/vagrant/.cargo/bin/delta
+  when: box_config.git.delta
+
+- name: Configure git to use delta as pager
+  become_user: vagrant
+  command: "{{ item }}"
+  loop:
+    - git config --global core.pager delta
+    - git config --global interactive.diffFilter "delta --color-only"
+    - git config --global delta.navigate true
+    - git config --global delta.syntax-theme ansi
+    - git config --global merge.conflictStyle zdiff3
+  when: box_config.git.delta
+  changed_when: false

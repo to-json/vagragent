@@ -1,0 +1,27 @@
+---
+- name: Install Rust toolchain
+  block:
+    - name: Install rustup from Debian repos
+      apt:
+        name: rustup
+        state: present
+
+    - name: Initialize rustup for vagrant user
+      become_user: vagrant
+      command: rustup default {{ box_config.rust.version }}
+      args:
+        creates: /home/vagrant/.rustup/toolchains
+
+    - name: Add cargo to PATH in bashrc
+      lineinfile:
+        path: /home/vagrant/.bashrc
+        line: 'export PATH="$HOME/.cargo/bin:$PATH"'
+        create: true
+        owner: vagrant
+        group: vagrant
+
+    - name: Install rust-analyzer
+      become_user: vagrant
+      command: rustup component add rust-analyzer
+      when: box_config.rust.rust_analyzer
+  when: box_config.rust.enabled

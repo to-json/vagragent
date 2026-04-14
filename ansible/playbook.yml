@@ -1,0 +1,17 @@
+---
+- name: Provision agent-box
+  hosts: all
+  become: true
+
+  roles:
+    - base
+    - go
+    - rust
+    - typescript
+    - python
+    - system
+    - git
+    - shell
+    - http
+    - neovim
+    - ai_tools

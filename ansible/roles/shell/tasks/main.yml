@@ -1,0 +1,226 @@
+---
+# ── tmux ──────────────────────────────────────────────────────────
+- name: Install tmux
+  apt:
+    name: tmux
+    state: present
+  when: box_config.shell.tmux
+
+- name: Configure tmux (prefix C-a + everforest)
+  copy:
+    dest: /home/vagrant/.tmux.conf
+    owner: vagrant
+    group: vagrant
+    mode: "0644"
+    content: |
+      # Remap prefix to C-a
+      unbind C-b
+      set -g prefix C-a
+      bind C-a send-prefix
+
+      # Quality of life
+      set -g mouse on
+      set -g base-index 1
+      setw -g pane-base-index 1
+      set -g renumber-windows on
+      set -g default-terminal "tmux-256color"
+      set -ga terminal-overrides ",*256col*:Tc"
+
+      # Everforest dark medium palette
+      set -g status-style "bg=#2d353b,fg=#d3c6aa"
+      set -g pane-border-style "fg=#4f585e"
+      set -g pane-active-border-style "fg=#a7c080"
+      set -g message-style "bg=#343f44,fg=#d3c6aa"
+      set -g status-left "#[bg=#a7c080,fg=#2d353b,bold] #S #[default] "
+      set -g status-right "#[fg=#a7c080]%H:%M "
+      setw -g window-status-format "#[fg=#859289] #I:#W "
+      setw -g window-status-current-format "#[fg=#a7c080,bold] #I:#W "
+  when: box_config.shell.tmux
+
+# ── fzf ───────────────────────────────────────────────────────────
+- name: Install fzf
+  apt:
+    name: fzf
+    state: present
+  when: box_config.shell.fzf
+
+# ── bat ───────────────────────────────────────────────────────────
+- name: Install bat
+  apt:
+    name: bat
+    state: present
+  when: box_config.shell.bat
+
+- name: Symlink batcat to bat
+  file:
+    src: /usr/bin/batcat
+    dest: /usr/local/bin/bat
+    state: link
+  when: box_config.shell.bat
+
+# ── direnv ────────────────────────────────────────────────────────
+- name: Install direnv
+  apt:
+    name: direnv
+    state: present
+  when: box_config.shell.direnv
+
+- name: Hook direnv into bashrc
+  lineinfile:
+    path: /home/vagrant/.bashrc
+    line: 'eval "$(direnv hook bash)"'
+    create: true
+    owner: vagrant
+    group: vagrant
+  when: box_config.shell.direnv
+
+# ── cargo installs ───────────────────────────────────────────────
+- name: Install lsd via cargo
+  become_user: vagrant
+  command: /home/vagrant/.cargo/bin/cargo install lsd
+  args:
+    creates: /home/vagrant/.cargo/bin/lsd
+  when: box_config.shell.lsd
+
+- name: Install television via cargo
+  become_user: vagrant
+  command: /home/vagrant/.cargo/bin/cargo install television
+  args:
+    creates: /home/vagrant/.cargo/bin/tv
+  when: box_config.shell.television
+
+- name: Install starship via cargo
+  become_user: vagrant
+  command: /home/vagrant/.cargo/bin/cargo install starship
+  args:
+    creates: /home/vagrant/.cargo/bin/starship
+  when: box_config.shell.starship
+
+- name: Hook starship into bashrc
+  lineinfile:
+    path: /home/vagrant/.bashrc
+    line: 'eval "$(starship init bash)"'
+    create: true
+    owner: vagrant
+    group: vagrant
+  when: box_config.shell.starship
+
+- name: Install zoxide via cargo
+  become_user: vagrant
+  command: /home/vagrant/.cargo/bin/cargo install zoxide
+  args:
+    creates: /home/vagrant/.cargo/bin/zoxide
+  when: box_config.shell.zoxide
+
+- name: Hook zoxide into bashrc
+  lineinfile:
+    path: /home/vagrant/.bashrc
+    line: 'eval "$(zoxide init bash)"'
+    create: true
+    owner: vagrant
+    group: vagrant
+  when: box_config.shell.zoxide
+
+- name: Install yazi via cargo
+  become_user: vagrant
+  command: /home/vagrant/.cargo/bin/cargo install yazi-fm yazi-cli
+  args:
+    creates: /home/vagrant/.cargo/bin/yazi
+  when: box_config.shell.yazi
+
+- name: Install tealdeer via cargo
+  become_user: vagrant
+  command: /home/vagrant/.cargo/bin/cargo install tealdeer
+  args:
+    creates: /home/vagrant/.cargo/bin/tldr
+  when: box_config.shell.tealdeer
+
+- name: Install sd via cargo
+  become_user: vagrant
+  command: /home/vagrant/.cargo/bin/cargo install sd
+  args:
+    creates: /home/vagrant/.cargo/bin/sd
+  when: box_config.shell.sd
+
+- name: Install dust via cargo
+  become_user: vagrant
+  command: /home/vagrant/.cargo/bin/cargo install du-dust
+  args:
+    creates: /home/vagrant/.cargo/bin/dust
+  when: box_config.shell.dust
+
+- name: Install hyperfine via cargo
+  become_user: vagrant
+  command: /home/vagrant/.cargo/bin/cargo install hyperfine
+  args:
+    creates: /home/vagrant/.cargo/bin/hyperfine
+  when: box_config.shell.hyperfine
+
+- name: Install just via cargo
+  become_user: vagrant
+  command: /home/vagrant/.cargo/bin/cargo install just
+  args:
+    creates: /home/vagrant/.cargo/bin/just
+  when: box_config.shell.just
+
+# ── go installs ──────────────────────────────────────────────────
+- name: Install sesh via go install
+  become_user: vagrant
+  command: /usr/local/go/bin/go install github.com/joshmedeski/sesh@latest
+  args:
+    creates: /home/vagrant/go/bin/sesh
+  environment:
+    GOPATH: /home/vagrant/go
+    PATH: "/usr/local/go/bin:{{ ansible_env.PATH }}"
+  when: box_config.shell.sesh
+
+# ── everforest colors (bash profile) ──────────────────────────────
+- name: Set everforest terminal colors in profile
+  copy:
+    dest: /home/vagrant/.bash_everforest
+    owner: vagrant
+    group: vagrant
+    mode: "0644"
+    content: |
+      # Everforest Dark Medium — 16 ANSI colors
+      printf '\e]4;0;#4b565c\e\\'   # black
+      printf '\e]4;1;#e67e80\e\\'   # red
+      printf '\e]4;2;#a7c080\e\\'   # green
+      printf '\e]4;3;#dbbc7f\e\\'   # yellow
+      printf '\e]4;4;#7fbbb3\e\\'   # blue
+      printf '\e]4;5;#d699b6\e\\'   # magenta
+      printf '\e]4;6;#83c092\e\\'   # cyan
+      printf '\e]4;7;#d3c6aa\e\\'   # white
+      printf '\e]4;8;#5c6a72\e\\'   # bright black
+      printf '\e]4;9;#e67e80\e\\'   # bright red
+      printf '\e]4;10;#a7c080\e\\'  # bright green
+      printf '\e]4;11;#dbbc7f\e\\'  # bright yellow
+      printf '\e]4;12;#7fbbb3\e\\'  # bright blue
+      printf '\e]4;13;#d699b6\e\\'  # bright magenta
+      printf '\e]4;14;#83c092\e\\'  # bright cyan
+      printf '\e]4;15;#d3c6aa\e\\'  # bright white
+      printf '\e]10;#d3c6aa\e\\'    # foreground
+      printf '\e]11;#2d353b\e\\'    # background
+  when: box_config.shell.everforest_colors
+
+- name: Source everforest colors from bashrc
+  lineinfile:
+    path: /home/vagrant/.bashrc
+    line: '[ -f ~/.bash_everforest ] && source ~/.bash_everforest'
+    create: true
+    owner: vagrant
+    group: vagrant
+  when: box_config.shell.everforest_colors
+
+# ── shell aliases ─────────────────────────────────────────────────
+- name: Add shell aliases
+  blockinfile:
+    path: /home/vagrant/.bashrc
+    marker: "# {mark} agent-box aliases"
+    block: |
+      alias ls='lsd'
+      alias ll='lsd -la'
+      alias cat='bat --paging=never'
+    create: true
+    owner: vagrant
+    group: vagrant

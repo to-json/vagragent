@@ -1,0 +1,28 @@
+---
+- name: Install neovim
+  block:
+    - name: Download neovim appimage
+      get_url:
+        url: "https://github.com/neovim/neovim/releases/latest/download/nvim-linux-{{ ansible_architecture }}.tar.gz"
+        dest: /tmp/nvim.tar.gz
+
+    - name: Extract neovim
+      unarchive:
+        src: /tmp/nvim.tar.gz
+        dest: /opt
+        remote_src: true
+
+    - name: Symlink nvim to PATH
+      file:
+        src: "/opt/nvim-linux-{{ ansible_architecture }}/bin/nvim"
+        dest: /usr/local/bin/nvim
+        state: link
+
+    - name: Set EDITOR in profile
+      lineinfile:
+        path: /home/vagrant/.bashrc
+        line: 'export EDITOR=nvim'
+        create: true
+        owner: vagrant
+        group: vagrant
+  when: box_config.neovim.enabled

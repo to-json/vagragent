@@ -1,0 +1,63 @@
+---
+# box_config is passed in from the Vagrantfile via ansible.extra_vars.
+# Defaults here so the playbook works standalone too.
+box_config:
+  workspace:
+    repos_dir: "~/repos"
+    guest_mount: "/home/vagrant/repos"
+  shell:
+    sesh: true
+    lsd: true
+    bat: true
+    fzf: true
+    television: true
+    tmux: true
+    everforest_colors: true
+    starship: true
+    zoxide: true
+    yazi: true
+    tealdeer: true
+    sd: true
+    dust: true
+    hyperfine: true
+    just: true
+    direnv: true
+  git:
+    lazygit: true
+    delta: true
+  neovim:
+    enabled: true
+    sync_host_config: false
+  ai_tools:
+    claude: true
+    gemini: true
+    opencode: true
+    codex: true
+    pi: true
+    aider: true
+    mods: true
+  http:
+    xh: true
+    glow: true
+    yq: true
+  system:
+    btop: true
+    ripgrep: true
+    fd: true
+    jq: true
+  go:
+    enabled: true
+    version: "1.24.2"
+  rust:
+    enabled: true
+    version: "stable"
+    rust_analyzer: true
+  typescript:
+    enabled: true
+    node_version: "22"
+    typescript_lsp: true
+  python:
+    enabled: true
+    version: "3.12"
+    uv: true
+    lsp: true

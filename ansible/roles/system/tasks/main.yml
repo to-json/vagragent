@@ -1,0 +1,32 @@
+---
+# ── apt installs ─────────────────────────────────────────────────
+- name: Install btop
+  apt:
+    name: btop
+    state: present
+  when: box_config.system.btop
+
+- name: Install ripgrep
+  apt:
+    name: ripgrep
+    state: present
+  when: box_config.system.ripgrep
+
+- name: Install fd-find
+  apt:
+    name: fd-find
+    state: present
+  when: box_config.system.fd
+
+- name: Symlink fdfind to fd
+  file:
+    src: /usr/bin/fdfind
+    dest: /usr/local/bin/fd
+    state: link
+  when: box_config.system.fd
+
+- name: Install jq
+  apt:
+    name: jq
+    state: present
+  when: box_config.system.jq

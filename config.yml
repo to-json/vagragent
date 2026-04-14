@@ -1,0 +1,82 @@
+---
+# agent-box config
+# Toggle features on/off and set versions.
+# Re-run `vagrant provision` after changes.
+
+# ── Workspace ─────────────────────────────────────────────────────
+workspace:
+  repos_dir: "~/repos"       # host directory to mount into the VM
+  guest_mount: "/home/vagrant/repos"
+
+# ── Shell & Usability ─────────────────────────────────────────────
+shell:
+  sesh: true
+  lsd: true
+  bat: true
+  fzf: true
+  television: true
+  tmux: true                # prefix remapped to C-a
+  everforest_colors: true   # terminal + tmux theme
+  starship: true            # cross-shell prompt
+  zoxide: true              # smart cd
+  yazi: true                # terminal file manager
+  tealdeer: true            # fast tldr pages
+  sd: true                  # sed replacement
+  dust: true                # du replacement
+  hyperfine: true           # CLI benchmarking
+  just: true                # command runner
+  direnv: true              # per-directory env vars
+
+# ── Git Tools ─────────────────────────────────────────────────────
+git:
+  lazygit: true
+  delta: true               # syntax-highlighted diffs
+
+# ── Neovim ────────────────────────────────────────────────────────
+neovim:
+  enabled: true
+  sync_host_config: false   # mount ~/.config/nvim from host into guest
+
+# ── AI Tools ──────────────────────────────────────────────────────
+ai_tools:
+  claude: true
+  gemini: true
+  opencode: true
+  codex: true
+  pi: true
+  aider: true               # AI pair programming
+  mods: true                # pipe text through LLMs
+
+# ── Network & HTTP ────────────────────────────────────────────────
+http:
+  xh: true                  # friendly HTTP client
+  glow: true                # render markdown in terminal
+  yq: true                  # jq for YAML/TOML
+
+# ── System ────────────────────────────────────────────────────────
+system:
+  btop: true                # system monitor TUI
+  ripgrep: true             # fast grep
+  fd: true                  # fast find
+  jq: true                  # JSON processor
+
+# ── Languages ─────────────────────────────────────────────────────
+go:
+  enabled: true
+  version: "1.24.2"
+
+rust:
+  enabled: true
+  version: "stable"         # stable | nightly | 1.78.0
+  rust_analyzer: true
+
+typescript:
+  enabled: true
+  node_version: "22"        # major version via nodesource
+  typescript_lsp: true      # typescript-language-server
+
+python:
+  enabled: true
+  version: "3.12"           # installed via deadsnakes if not system default
+  uv: true
+  lsp: true                 # python-lsp-server via uv/pip

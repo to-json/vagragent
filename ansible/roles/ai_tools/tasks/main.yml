@@ -1,0 +1,88 @@
+---
+# ── Claude Code ───────────────────────────────────────────────────
+- name: Install Claude Code
+  block:
+    - name: Ensure Node.js is installed (required for claude)
+      include_role:
+        name: typescript
+        tasks_from: node
+    - name: Install claude via npm
+      npm:
+        name: "@anthropic-ai/claude-code"
+        global: true
+        state: present
+  when: box_config.ai_tools.claude
+
+# ── Gemini CLI ────────────────────────────────────────────────────
+# NOTE: verify the npm package name — may be @anthropic-ai/claude-code is wrong
+# Google's Gemini CLI npm package name may differ. Update once confirmed.
+- name: Install Gemini CLI
+  npm:
+    name: "@anthropic-ai/gemini-cli"
+    global: true
+    state: present
+  when: box_config.ai_tools.gemini
+  ignore_errors: true
+
+# ── OpenCode ──────────────────────────────────────────────────────
+- name: Install OpenCode from GitHub release
+  block:
+    - name: Get arch for opencode
+      command: dpkg --print-architecture
+      register: oc_arch
+      changed_when: false
+
+    - name: Download opencode binary
+      get_url:
+        url: "https://github.com/opencode-ai/opencode/releases/latest/download/opencode_linux_{{ oc_arch.stdout }}.tar.gz"
+        dest: /tmp/opencode.tar.gz
+
+    - name: Extract opencode
+      unarchive:
+        src: /tmp/opencode.tar.gz
+        dest: /usr/local/bin
+        remote_src: true
+        extra_opts: [--wildcards, opencode]
+  when: box_config.ai_tools.opencode
+
+# ── Codex ─────────────────────────────────────────────────────────
+- name: Install Codex CLI
+  npm:
+    name: "@openai/codex"
+    global: true
+    state: present
+  when: box_config.ai_tools.codex
+
+# ── Pi (Inflection AI) ───────────────────────────────────────────
+- name: Install Pi CLI from GitHub release
+  block:
+    - name: Get arch for pi
+      command: dpkg --print-architecture
+      register: pi_arch
+      changed_when: false
+
+    - name: Download pi binary
+      get_url:
+        url: "https://github.com/inflection-ai/pi-cli/releases/latest/download/pi-linux-{{ pi_arch.stdout }}"
+        dest: /usr/local/bin/pi
+        mode: "0755"
+  when: box_config.ai_tools.pi
+
+# ── Aider ─────────────────────────────────────────────────────────
+- name: Install aider via uv
+  command: uv tool install aider-chat
+  args:
+    creates: /home/vagrant/.local/bin/aider
+  become_user: vagrant
+  when: box_config.ai_tools.aider
+
+# ── Mods (Charmbracelet) ─────────────────────────────────────────
+- name: Install mods via go install
+  become_user: vagrant
+  command: /usr/local/go/bin/go install github.com/charmbracelet/mods@latest
+  args:
+    creates: /home/vagrant/go/bin/mods
+  environment:
+    GOPATH: /home/vagrant/go
+    PATH: "/usr/local/go/bin:{{ ansible_env.PATH }}"
+  when: box_config.ai_tools.mods

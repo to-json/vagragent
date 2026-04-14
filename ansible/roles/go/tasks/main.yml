@@ -1,0 +1,34 @@
+---
+- name: Install Go
+  block:
+    - name: Get architecture
+      command: dpkg --print-architecture
+      register: go_arch
+      changed_when: false
+
+    - name: Download Go tarball
+      get_url:
+        url: "https://go.dev/dl/go{{ box_config.go.version }}.linux-{{ go_arch.stdout }}.tar.gz"
+        dest: /tmp/go.tar.gz
+
+    - name: Remove old Go install
+      file:
+        path: /usr/local/go
+        state: absent
+
+    - name: Extract Go
+      unarchive:
+        src: /tmp/go.tar.gz
+        dest: /usr/local
+        remote_src: true
+
+    - name: Add Go to PATH
+      blockinfile:
+        path: /home/vagrant/.bashrc
+        marker: "# {mark} go path"
+        block: |
+          export PATH="/usr/local/go/bin:$HOME/go/bin:$PATH"
+        create: true
+        owner: vagrant
+        group: vagrant
+  when: box_config.go.enabled

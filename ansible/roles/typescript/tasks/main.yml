@@ -1,0 +1,19 @@
+---
+- name: Install Node.js and TypeScript tooling
+  block:
+    - name: Install Node.js
+      include_tasks: node.yml
+
+    - name: Install typescript-language-server
+      npm:
+        name: typescript-language-server
+        global: true
+        state: present
+      when: box_config.typescript.typescript_lsp
+
+    - name: Install TypeScript globally
+      npm:
+        name: typescript
+        global: true
+        state: present
+  when: box_config.typescript.enabled

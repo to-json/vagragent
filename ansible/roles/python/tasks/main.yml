@@ -1,0 +1,30 @@
+---
+- name: Install Python toolchain
+  block:
+    - name: Install Python and venv
+      apt:
+        name:
+          - "python3"
+          - "python3-venv"
+          - "python3-pip"
+        state: present
+
+    - name: Install uv via pip
+      pip:
+        name: uv
+        state: present
+      when: box_config.python.uv
+
+    - name: Install python-lsp-server via uv
+      become_user: vagrant
+      command: uv tool install python-lsp-server
+      args:
+        creates: /home/vagrant/.local/bin/pylsp
+      when: box_config.python.lsp and box_config.python.uv
+
+    - name: Install python-lsp-server via pip
+      pip:
+        name: python-lsp-server
+        state: present
+      when: box_config.python.lsp and not box_config.python.uv
+  when: box_config.python.enabled
